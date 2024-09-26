@@ -1,14 +1,14 @@
 declare module 'brownian' {
     /**
      * @description Generates a Brownian motion path
-     * @param startX Starting x-coordinate
-     * @param startY Starting y-coordinate
+     * @param start_x Starting x-coordinate
+     * @param start_y Starting y-coordinate
      * @param steps Number of steps to take
      * @returns Array of [x, y] positions
      */
     export function brownian(
-        startX: number,
-        startY: number,
+        start_x: number,
+        start_y: number,
         steps: number,
     ): number[][];
 }

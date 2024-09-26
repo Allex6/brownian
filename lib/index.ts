@@ -2,14 +2,14 @@ import { rand } from './utils/random.utils';
 
 /**
  * @description Generates a Brownian motion path
- * @param startX Starting x-coordinate
- * @param startY Starting y-coordinate
+ * @param start_x Starting x-coordinate
+ * @param start_y Starting y-coordinate
  * @param steps Number of steps to take
  * @returns Array of [x, y] positions
  */
-export function brownian(startX: number, startY: number, steps: number) {
-    let x = startX;
-    let y = startY;
+export function brownian(start_x: number, start_y: number, steps: number) {
+    let x = start_x;
+    let y = start_y;
     const positions = [];
 
     for (let i = 0; i < steps; i++) {
