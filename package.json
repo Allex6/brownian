@@ -10,7 +10,9 @@
         "format": "prettier --write .",
         "check:format": "prettier --check .",
         "check:exports": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
-        "test": "vitest run"
+        "test": "vitest run",
+        "local:release": "changesets version && changesets publish",
+        "prepublishOnly": "npm run ci"
     },
     "keywords": [
         "brownian",
@@ -28,6 +30,7 @@
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.16.4",
+        "@changesets/cli": "^2.27.8",
         "@swc/cli": "^0.3.12",
         "@swc/core": "^1.4.17",
         "@types/node": "^22.7.2",
