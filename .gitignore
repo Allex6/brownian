@@ -1,5 +1,11 @@
+# Ignore the node_modules folder
 node_modules
 
+# Just a local folder to test things out
 local
 
+# The dist directory is where the compiled code goes
 dist
+
+# Coverage is where the test coverage reports go
+coverage
