@@ -65,12 +65,12 @@ If you would like to contribute to the library, please follow the instructions b
 
 ## Roadmap (in no particular order)
 
--   [ ] Implementar suporte para simulações em 3D
--   [ ] Implementar suporte para visualização gráfica dos resultados
--   [ ] Melhorar a precisão numérica da simulação
--   [ ] Melhorar o desempenho da simulação
--   [ ] Possibilitar simulações mais complexas, como partículas interagindo entre si, forças externas, etc.
--   [ ] Implementar um exemplo de aplicação prática da biblioteca
+-   [ ] Implement support for 3D simulations
+-   [ ] Implement support for graphical visualization of the results
+-   [ ] Improve the numerical precision of the simulation
+-   [ ] Improve the performance of the simulation
+-   [ ] Allow more complex simulations, such as particles interacting with each other, external forces, etc
+-   [ ] Implement a practical application example of the library
 
 ## Goals
 
