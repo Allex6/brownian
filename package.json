@@ -12,7 +12,7 @@
         "check:exports": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
         "test": "vitest run",
         "coverage": "vitest run --coverage",
-        "local:release": "changesets version && changesets publish",
+        "local:release": "changeset version && changeset publish",
         "prepublishOnly": "npm run ci"
     },
     "keywords": [
