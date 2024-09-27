@@ -20,7 +20,10 @@
         "brownian motion",
         "brownian diffusion",
         "simulation",
-        "algorithm"
+        "algorithm",
+        "stochastic",
+        "random walk",
+        "random motion"
     ],
     "author": "Alex Souza",
     "license": "MIT",
