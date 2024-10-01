@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import { rand } from '../../lib/utils/random.utils';
+import { rand, randNormal } from '../../lib/utils/random.utils';
 
 describe('Random utils', () => {
     it('should generate an inclusive random number given a range', () => {
@@ -16,5 +16,12 @@ describe('Random utils', () => {
         const result = rand(range_start, range_end);
         expect(result).toBeGreaterThanOrEqual(range_start);
         expect(result).toBeLessThanOrEqual(range_end);
+    });
+
+    it('should correctly generate a normally distributed random number', () => {
+        const mean = 0;
+        const stdDev = 1;
+        const result = randNormal(mean, stdDev);
+        expect(result).toBeTypeOf('number');
     });
 });
