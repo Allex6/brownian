@@ -1,3 +1,5 @@
+import { DistanceUnit } from './distance.interface';
+
 /**
  * @description Options for the Brownian motion function
  */
@@ -15,9 +17,21 @@ export interface BrownianOptions {
      */
     steps: number;
     /**
-     * @description Time step between each step
+     * @description The distance moved in each step of the simulation, representing the magnitude of each random movement
      */
-    time_step: number;
+    step_size: number;
+    /**
+     * @description Time unit
+     */
+    // time: TimeUnit;
+    /**
+     * @description Velocity unit
+     */
+    // velocity: VelocityUnit;
+    /**
+     * @description Distance unit
+     */
+    distance: DistanceUnit;
 }
 
 /**
@@ -28,4 +42,8 @@ export interface BrownianOutput {
      * @description Array of [x, y] positions
      */
     path: number[][];
+    /**
+     * @description Total distance moved along the path
+     */
+    total_distance: number;
 }
