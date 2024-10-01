@@ -33,12 +33,24 @@ const starting_x = 0;
 const starting_y = 0;
 // Number of steps to simulate
 const n_steps = 1000;
+// The distance the particle moves in each step
+const step_size = 0.1;
+// The unit of distance to be used in the simulation
+const distance = 'centimeters';
 
 // Simulate the Brownian motion of a particle starting at the position (0, 0) for 1000 steps on a cartesian plane
-const path = brownian(starting_x, starting_y, n_steps);
+const { path, total_distance } = brownian({
+    start_x: starting_x,
+    start_y: starting_y,
+    steps: n_steps,
+    step_size: step_size,
+    distance: distance,
+});
 
 console.log(path); // Shows the path of the particle on the cartesian plane
 // Something like [ [0, 0], [1.2547..., 0.8648...], ... ]
+
+console.log(total_distance); // Shows the total distance traveled by the particle
 ```
 
 ## Limitations
