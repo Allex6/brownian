@@ -1,5 +1,11 @@
 # brownian
 
+## 3.1.0
+
+### Minor Changes
+
+-   0c3d8f6: Adds the concepts of diffusion and velocity to the simulation. Allows dynamic calculation of the diffusion coefficient, and calculates the particle velocity at each step of the simulation
+
 ## 3.0.0
 
 ### Major Changes
