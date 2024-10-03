@@ -2,10 +2,10 @@
     "name": "brownian",
     "version": "3.1.0",
     "main": "dist/index.js",
-    "types": "lib/@types/index.d.ts",
+    "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "swc lib -d dist --strip-leading-paths",
+        "build": "npx tsc",
         "ci": "npm run build && npm run check:format && npm run check:exports && npm run test",
         "format": "prettier --write .",
         "check:format": "prettier --check .",
@@ -35,8 +35,6 @@
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.16.4",
         "@changesets/cli": "^2.27.8",
-        "@swc/cli": "^0.3.12",
-        "@swc/core": "^1.4.17",
         "@types/node": "^22.7.2",
         "@vitest/coverage-v8": "^2.1.1",
         "eslint-config-prettier": "^9.1.0",
