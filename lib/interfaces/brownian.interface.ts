@@ -1,4 +1,5 @@
 import { DistanceUnit } from './distance.interface';
+import { DiffusionFunction } from './time.interface';
 
 /**
  * @description Options for the Brownian motion function
@@ -21,17 +22,13 @@ export interface BrownianOptions {
      */
     step_size: number;
     /**
-     * @description Time unit
-     */
-    // time: TimeUnit;
-    /**
-     * @description Velocity unit
-     */
-    // velocity: VelocityUnit;
-    /**
      * @description Distance unit
      */
     distance: DistanceUnit;
+    /**
+     * @description The diffusion coefficient, which is a measure of how particles spread out over time. This can be a number or a function that calculates the diffusion coefficient at a given time and position
+     */
+    diffusion_coefficient: number | DiffusionFunction;
 }
 
 /**
@@ -46,4 +43,12 @@ export interface BrownianOutput {
      * @description Total distance moved along the path
      */
     total_distance: number;
+    /**
+     * @description Array of times at which the particle was at each position
+     */
+    times: number[];
+    /**
+     * @description Array of velocities at each position
+     */
+    velocities: number[];
 }
