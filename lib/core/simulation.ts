@@ -1,11 +1,14 @@
-import { createParticle } from '../factories/particle.factory';
-import { Particle, ParticleCreation } from '../interfaces/particle.interface';
+import { createParticle } from '../factories/particle.factory.js';
+import {
+    Particle,
+    ParticleCreation,
+} from '../interfaces/particle.interface.js';
 import {
     SimulationInterface,
     SimulationOptions,
     SimulationOutput,
-} from '../interfaces/simulation.interface';
-import { randNormal } from '../utils/random.utils';
+} from '../interfaces/simulation.interface.js';
+import { randNormal } from '../utils/random.utils.js';
 
 export class Simulation implements SimulationInterface {
     public running: boolean = false;
@@ -16,7 +19,7 @@ export class Simulation implements SimulationInterface {
     private particles_history: Particle[][] = [];
     private times: number[] = [];
     private pause_interval: NodeJS.Timeout | null = null;
-    private current_simulation_step: number = 0;
+    private current_simulation_step: number = -1;
 
     constructor(options: SimulationOptions) {
         this.options = options;
