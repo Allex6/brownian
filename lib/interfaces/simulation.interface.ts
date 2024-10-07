@@ -27,7 +27,7 @@ export interface SimulationInterface {
      * @description Run the simulation and return the output
      * @returns Particles and their paths during the simulation, along with the times at each step
      */
-    run: () => SimulationOutput;
+    run: () => Promise<SimulationOutput>;
     /**
      * @description Stop the simulation if it is running
      */

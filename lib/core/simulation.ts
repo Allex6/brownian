@@ -13,6 +13,11 @@ export class Simulation implements SimulationInterface {
     public particles: Particle[] = [];
     public options: SimulationOptions;
 
+    private particles_history: Particle[][] = [];
+    private times: number[] = [];
+    private pause_interval: NodeJS.Timeout | null = null;
+    private current_simulation_step: number = 0;
+
     constructor(options: SimulationOptions) {
         this.options = options;
         this.initParticles();
@@ -30,30 +35,48 @@ export class Simulation implements SimulationInterface {
         this.particles.push(createParticle(particle));
     }
 
-    stop() {
+    stop(): SimulationOutput {
         this.stopped = true;
         this.running = false;
+        return this.finish();
     }
 
     pause() {
         this.running = false;
+        this.pause_interval = setInterval(() => {
+            if (this.running) {
+                clearInterval(this.pause_interval as NodeJS.Timeout);
+                this.pause_interval = null;
+                return;
+            }
+        }, 100);
     }
 
     resume() {
         this.running = true;
+        this.run();
     }
 
-    run(): SimulationOutput {
-        const { steps, step_size } = this.options;
-        const local_particles: Particle[][] = [];
-        const times = [];
+    async run(): Promise<SimulationOutput> {
+        this.stopped = false;
+        this.running = true;
 
-        for (let i = 0; i < steps; i++) {
+        const { steps, step_size } = this.options;
+
+        for (let i = this.current_simulation_step + 1; i < steps; i++) {
+            // Check if the simulation has been stopped or paused
+            if (this.stopped || !this.running) {
+                break;
+            }
+
+            // Save the current simulation step
+            this.current_simulation_step = i;
+
             // Calculate the time
             const time = i * step_size;
 
             // Save the time
-            times.push(time);
+            this.times.push(time);
 
             // Array to store the particles at each step
             const step_particles: Particle[] = [];
@@ -109,12 +132,19 @@ export class Simulation implements SimulationInterface {
             }
 
             // Save the particles at each step
-            local_particles.push(step_particles);
+            this.particles_history.push(step_particles);
+
+            // Allow the event loop to process other tasks
+            await new Promise((resolve) => setImmediate(resolve));
         }
 
+        return this.stop();
+    }
+
+    finish(): SimulationOutput {
         return {
-            path: local_particles,
-            times,
+            path: this.particles_history,
+            times: this.times,
         };
     }
 }
