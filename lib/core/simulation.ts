@@ -121,12 +121,14 @@ export class Simulation implements SimulationInterface {
         const {
             x: particle_x,
             y: particle_y,
+            z: particle_z,
             diffusion_coefficient,
         } = particle;
 
         // Save the particle position
         let x = particle_x;
         let y = particle_y;
+        let z = particle_z;
 
         // Calculate the diffusion coefficient
         const D =
@@ -140,14 +142,17 @@ export class Simulation implements SimulationInterface {
         // Calculate the change in x and y
         const dx = randNormal(0, variance);
         const dy = randNormal(0, variance);
+        const dz = randNormal(0, variance);
 
         // Move in the direction of the angle
         x += dx;
         y += dy;
+        z = typeof z === 'number' ? z + dz : undefined;
 
         // Update the particle position
         particle.x = x;
         particle.y = y;
+        particle.z = z;
 
         // Calculate the distance moved
         const distance_moved = Math.sqrt(dx ** 2 + dy ** 2);

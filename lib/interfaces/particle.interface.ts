@@ -10,6 +10,10 @@ export interface Particle {
      */
     y: number;
     /**
+     * @description Particle's z-coordinate
+     */
+    z?: number;
+    /**
      * @description Particle's instantaneous velocity
      */
     velocity: number;
