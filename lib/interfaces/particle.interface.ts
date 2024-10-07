@@ -1,4 +1,4 @@
-import { DiffusionFunction } from './time.interface';
+import { DiffusionFunction } from './time.interface.js';
 
 export interface Particle {
     /**

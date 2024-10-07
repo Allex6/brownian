@@ -1,4 +1,7 @@
-import { Particle, ParticleCreation } from '../interfaces/particle.interface';
+import {
+    Particle,
+    ParticleCreation,
+} from '../interfaces/particle.interface.js';
 
 /**
  * @description Build a particle at its initial state

@@ -1,11 +1,14 @@
-import { createParticle } from '../factories/particle.factory';
-import { Particle, ParticleCreation } from '../interfaces/particle.interface';
+import { createParticle } from '../factories/particle.factory.js';
+import {
+    Particle,
+    ParticleCreation,
+} from '../interfaces/particle.interface.js';
 import {
     SimulationInterface,
     SimulationOptions,
     SimulationOutput,
-} from '../interfaces/simulation.interface';
-import { randNormal } from '../utils/random.utils';
+} from '../interfaces/simulation.interface.js';
+import { randNormal } from '../utils/random.utils.js';
 
 export class Simulation implements SimulationInterface {
     public running: boolean = false;
@@ -16,7 +19,7 @@ export class Simulation implements SimulationInterface {
     private particles_history: Particle[][] = [];
     private times: number[] = [];
     private pause_interval: NodeJS.Timeout | null = null;
-    private current_simulation_step: number = 0;
+    private current_simulation_step: number = -1;
 
     constructor(options: SimulationOptions) {
         this.options = options;
@@ -82,53 +85,10 @@ export class Simulation implements SimulationInterface {
             const step_particles: Particle[] = [];
 
             for (const particle of this.particles) {
-                // Get particle properties
-                const {
-                    x: particle_x,
-                    y: particle_y,
-                    diffusion_coefficient,
-                } = particle;
-
-                // Save the particle position
-                let x = particle_x;
-                let y = particle_y;
-
-                // Calculate the diffusion coefficient
-                const D =
-                    typeof diffusion_coefficient === 'function'
-                        ? diffusion_coefficient({ particle, t: time })
-                        : diffusion_coefficient;
-
-                // Calculate the variance of the normal distribution
-                const variance = 2 * D * step_size;
-
-                // Calculate the change in x and y
-                const dx = randNormal(0, variance);
-                const dy = randNormal(0, variance);
-
-                // Move in the direction of the angle
-                x += dx;
-                y += dy;
-
-                // Update the particle position
-                particle.x = x;
-                particle.y = y;
-
-                // Calculate the distance moved
-                const distance_moved = Math.sqrt(dx ** 2 + dy ** 2);
-
-                // Update the particle distance moved
-                particle.distance_moved = distance_moved;
-                particle.total_distance_moved += distance_moved;
-
-                // Calculate the velocity
-                const velocity = distance_moved / step_size;
-
-                // Update the particle velocity
-                particle.velocity = velocity;
-
                 // Save the particle's state
-                step_particles.push({ ...particle });
+                step_particles.push(
+                    this.processParticleAtEachStep(particle, time, step_size),
+                );
             }
 
             // Save the particles at each step
@@ -146,5 +106,59 @@ export class Simulation implements SimulationInterface {
             path: this.particles_history,
             times: this.times,
         };
+    }
+
+    processParticleAtEachStep(
+        particle: Particle,
+        time: number,
+        step_size: number,
+    ): Particle {
+        // Get particle properties
+        const {
+            x: particle_x,
+            y: particle_y,
+            diffusion_coefficient,
+        } = particle;
+
+        // Save the particle position
+        let x = particle_x;
+        let y = particle_y;
+
+        // Calculate the diffusion coefficient
+        const D =
+            typeof diffusion_coefficient === 'function'
+                ? diffusion_coefficient({ particle, t: time })
+                : diffusion_coefficient;
+
+        // Calculate the variance of the normal distribution
+        const variance = 2 * D * step_size;
+
+        // Calculate the change in x and y
+        const dx = randNormal(0, variance);
+        const dy = randNormal(0, variance);
+
+        // Move in the direction of the angle
+        x += dx;
+        y += dy;
+
+        // Update the particle position
+        particle.x = x;
+        particle.y = y;
+
+        // Calculate the distance moved
+        const distance_moved = Math.sqrt(dx ** 2 + dy ** 2);
+
+        // Update the particle distance moved
+        particle.distance_moved = distance_moved;
+        particle.total_distance_moved += distance_moved;
+
+        // Calculate the velocity
+        const velocity = distance_moved / step_size;
+
+        // Update the particle velocity
+        particle.velocity = velocity;
+
+        // Returns a copy of the particle with the updated properties
+        return { ...particle };
     }
 }
