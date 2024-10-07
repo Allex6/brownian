@@ -1,5 +1,5 @@
-import { Particle, ParticleCreation } from './particle.interface';
-import { DiffusionFunction } from './time.interface';
+import { Particle, ParticleCreation } from './particle.interface.js';
+import { DiffusionFunction } from './time.interface.js';
 
 export interface SimulationInterface {
     /**

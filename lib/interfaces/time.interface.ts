@@ -1,4 +1,4 @@
-import { Particle } from './particle.interface';
+import { Particle } from './particle.interface.js';
 
 export interface DiffusionFunctionOptions {
     /**
