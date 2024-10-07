@@ -86,9 +86,13 @@ export class Simulation implements SimulationInterface {
 
             for (const particle of this.particles) {
                 // Save the particle's state
-                step_particles.push(
-                    this.processParticleAtEachStep(particle, time, step_size),
-                );
+                step_particles.push({
+                    ...this.processParticleAtGivenStepAndTime(
+                        particle,
+                        time,
+                        step_size,
+                    ),
+                });
             }
 
             // Save the particles at each step
@@ -108,7 +112,7 @@ export class Simulation implements SimulationInterface {
         };
     }
 
-    processParticleAtEachStep(
+    processParticleAtGivenStepAndTime(
         particle: Particle,
         time: number,
         step_size: number,
@@ -159,6 +163,6 @@ export class Simulation implements SimulationInterface {
         particle.velocity = velocity;
 
         // Returns a copy of the particle with the updated properties
-        return { ...particle };
+        return particle;
     }
 }
