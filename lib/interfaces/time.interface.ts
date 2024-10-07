@@ -1,20 +1,10 @@
-export type TimeUnit =
-    | 'nanoseconds'
-    | 'microseconds'
-    | 'milliseconds'
-    | 'seconds'
-    | 'minutes'
-    | 'hours';
+import { Particle } from './particle.interface';
 
 export interface DiffusionFunctionOptions {
     /**
-     * @description Particle's x-coordinate
+     * @description Particle's information
      */
-    x: number;
-    /**
-     * @description Particle's y-coordinate
-     */
-    y: number;
+    particle: Particle;
     /**
      * @description Time
      */
