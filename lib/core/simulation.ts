@@ -8,6 +8,7 @@ import {
     SimulationOptions,
     SimulationOutput,
 } from '../interfaces/simulation.interface.js';
+import { DiffusionEquation } from '../interfaces/time.interface.js';
 import { randNormal } from '../utils/random.utils.js';
 
 export class Simulation implements SimulationInterface {
@@ -20,6 +21,8 @@ export class Simulation implements SimulationInterface {
     private times: number[] = [];
     private pause_interval: NodeJS.Timeout | null = null;
     private current_simulation_step: number = -1;
+
+    private readonly BOLTZMANN_CONSTANT = 1.38064852e-23;
 
     constructor(options: SimulationOptions) {
         this.options = options;
@@ -118,13 +121,7 @@ export class Simulation implements SimulationInterface {
         step_size: number,
     ): Particle {
         // Get particle properties
-        const {
-            x: particle_x,
-            y: particle_y,
-            z: particle_z,
-            diffusion_coefficient,
-            mass,
-        } = particle;
+        const { x: particle_x, y: particle_y, z: particle_z, mass } = particle;
 
         // Save the particle position
         let x = particle_x;
@@ -184,22 +181,61 @@ export class Simulation implements SimulationInterface {
      * @description Get the diffusion coefficient at a given time for a given particle. Calculates the global diffusion coefficient if it is defined, otherwise uses the particle's diffusion coefficient
      */
     getDiffusionCoefficient(particle: Particle, time: number): number {
+        const getCoefficient = (coefficient: any) => {
+            if (typeof coefficient === 'number') {
+                return coefficient;
+            } else if (typeof coefficient === 'string') {
+                return this.getDiffusionCoefficientBasedOnEquation(
+                    coefficient as DiffusionEquation,
+                    particle,
+                );
+            } else {
+                return coefficient({ particle, t: time });
+            }
+        };
+
         if (this.options.global_diffusion_coefficient) {
-            const { global_diffusion_coefficient } = this.options;
-
-            if (typeof global_diffusion_coefficient === 'number') {
-                return global_diffusion_coefficient;
-            } else {
-                return global_diffusion_coefficient({ particle, t: time });
-            }
+            return getCoefficient(this.options.global_diffusion_coefficient);
         } else {
-            const { diffusion_coefficient } = particle;
-
-            if (typeof diffusion_coefficient === 'number') {
-                return diffusion_coefficient;
-            } else {
-                return diffusion_coefficient({ particle, t: time });
-            }
+            return getCoefficient(particle.diffusion_coefficient);
         }
+    }
+
+    /**
+     * @description Get the diffusion coefficient based on the equation provided
+     */
+    getDiffusionCoefficientBasedOnEquation(
+        equation: DiffusionEquation,
+        particle: Particle,
+    ): number {
+        switch (equation) {
+            case 'Einstein-Stokes':
+                return this.einsteinStokesEquation(particle);
+            default:
+                return this.einsteinStokesEquation(particle);
+        }
+    }
+
+    /**
+     * @description Calculate the diffusion coefficient using the Einstein-Stokes equation
+     */
+    einsteinStokesEquation(particle: Particle): number {
+        const { radius } = particle;
+        const { viscosity, temperature } = this.options;
+
+        if (
+            typeof radius !== 'number' ||
+            typeof viscosity !== 'number' ||
+            typeof temperature !== 'number'
+        ) {
+            throw new Error(
+                'Missing required parameters for Einstein-Stokes equation',
+            );
+        }
+
+        return (
+            (this.BOLTZMANN_CONSTANT * temperature) /
+            (6 * Math.PI * viscosity * radius)
+        );
     }
 }
