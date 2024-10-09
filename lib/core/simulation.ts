@@ -123,6 +123,7 @@ export class Simulation implements SimulationInterface {
             y: particle_y,
             z: particle_z,
             diffusion_coefficient,
+            mass,
         } = particle;
 
         // Save the particle position
@@ -138,6 +139,15 @@ export class Simulation implements SimulationInterface {
 
         // Calculate the variance of the normal distribution
         const variance = 2 * D * step_size;
+
+        // calculate gravity force on each axis
+        const { gravity } = this.options;
+        if (gravity) {
+            const { x: gx, y: gy, z: gz } = gravity;
+            x += gx * mass;
+            y += gy * mass;
+            z = typeof z === 'number' ? z + gz * mass : undefined;
+        }
 
         // Calculate the change in x and y
         const dx = randNormal(0, variance);
@@ -155,7 +165,9 @@ export class Simulation implements SimulationInterface {
         particle.z = z;
 
         // Calculate the distance moved
-        const distance_moved = Math.sqrt(dx ** 2 + dy ** 2);
+        const distance_moved = Math.sqrt(
+            dx ** 2 + dy ** 2 + (typeof dz === 'number' ? dz ** 2 : 0),
+        );
 
         // Update the particle distance moved
         particle.distance_moved = distance_moved;
