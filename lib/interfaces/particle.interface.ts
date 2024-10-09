@@ -29,6 +29,10 @@ export interface Particle {
      * @description The distance moved by the particle in comparison to the previous step
      */
     distance_moved: number;
+    /**
+     * @description The mass of the particle
+     */
+    mass: number;
 }
 
 export type ParticleCreation = Omit<

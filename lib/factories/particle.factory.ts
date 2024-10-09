@@ -16,6 +16,7 @@ export function createParticle(params: ParticleCreation): Particle {
         diffusion_coefficient: params.diffusion_coefficient,
         total_distance_moved: 0,
         distance_moved: 0,
+        mass: params.mass,
     };
 }
 
