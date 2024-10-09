@@ -1,4 +1,4 @@
-import { DiffusionFunction } from './time.interface.js';
+import { DiffusionEquation, DiffusionFunction } from './time.interface.js';
 
 export interface Particle {
     /**
@@ -20,7 +20,7 @@ export interface Particle {
     /**
      * @description The diffusion coefficient, which is a measure of how the particle spreads out over time. This can be a number or a function that calculates the diffusion coefficient at a given time and position
      */
-    diffusion_coefficient: number | DiffusionFunction;
+    diffusion_coefficient: number | DiffusionFunction | DiffusionEquation;
     /**
      * @description The total distance moved by the particle so far in the simulation
      */
@@ -33,6 +33,10 @@ export interface Particle {
      * @description The mass of the particle
      */
     mass: number;
+    /**
+     * @description The radius of the particle
+     */
+    radius?: number;
 }
 
 export type ParticleCreation = Omit<

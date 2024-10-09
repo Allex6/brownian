@@ -1,6 +1,6 @@
 import { Gravity } from './force.interface.js';
 import { Particle, ParticleCreation } from './particle.interface.js';
-import { DiffusionFunction } from './time.interface.js';
+import { DiffusionEquation, DiffusionFunction } from './time.interface.js';
 
 export interface SimulationInterface {
     /**
@@ -59,11 +59,22 @@ export interface SimulationOptions {
     /**
      * @description The diffusion coefficient, which is a measure of how particles spread out over time. This can be a number or a function that calculates the diffusion coefficient at a given time and position
      */
-    global_diffusion_coefficient?: number | DiffusionFunction;
+    global_diffusion_coefficient?:
+        | number
+        | DiffusionFunction
+        | DiffusionEquation;
     /**
      * @description The gravitational force acting on the particles
      */
     gravity?: Gravity;
+    /**
+     * @description The temperature of the simulation, which affects the random movement of particles
+     */
+    temperature?: number;
+    /**
+     * @description The viscosity of the medium, which affects the random movement of particles
+     */
+    viscosity?: number;
 }
 
 export interface SimulationOutput {
