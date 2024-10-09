@@ -132,10 +132,7 @@ export class Simulation implements SimulationInterface {
         let z = particle_z;
 
         // Calculate the diffusion coefficient
-        const D =
-            typeof diffusion_coefficient === 'function'
-                ? diffusion_coefficient({ particle, t: time })
-                : diffusion_coefficient;
+        const D = this.getDiffusionCoefficient(particle, time);
 
         // Calculate the variance of the normal distribution
         const variance = 2 * D * step_size;
@@ -181,5 +178,28 @@ export class Simulation implements SimulationInterface {
 
         // Returns a copy of the particle with the updated properties
         return particle;
+    }
+
+    /**
+     * @description Get the diffusion coefficient at a given time for a given particle. Calculates the global diffusion coefficient if it is defined, otherwise uses the particle's diffusion coefficient
+     */
+    getDiffusionCoefficient(particle: Particle, time: number): number {
+        if (this.options.global_diffusion_coefficient) {
+            const { global_diffusion_coefficient } = this.options;
+
+            if (typeof global_diffusion_coefficient === 'number') {
+                return global_diffusion_coefficient;
+            } else {
+                return global_diffusion_coefficient({ particle, t: time });
+            }
+        } else {
+            const { diffusion_coefficient } = particle;
+
+            if (typeof diffusion_coefficient === 'number') {
+                return diffusion_coefficient;
+            } else {
+                return diffusion_coefficient({ particle, t: time });
+            }
+        }
     }
 }
