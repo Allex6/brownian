@@ -1,5 +1,13 @@
 # brownian
 
+## 3.2.0
+
+### Minor Changes
+
+-   c329e16: - Add improvements on simulation runs
+    -   Allow the simulations to be stopped, paused, and resumed
+    -   Improve code structure and readability
+
 ## 3.1.0
 
 ### Minor Changes

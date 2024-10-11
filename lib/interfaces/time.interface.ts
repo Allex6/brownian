@@ -15,3 +15,8 @@ export interface DiffusionFunctionOptions {
  * @description A function that calculates the diffusion of a particle
  */
 export type DiffusionFunction = (options: DiffusionFunctionOptions) => number;
+
+/**
+ * @description The diffusion equation that should be used to calculate the diffusion of particles
+ */
+export type DiffusionEquation = 'Einstein-Stokes';

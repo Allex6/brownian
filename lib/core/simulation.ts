@@ -8,6 +8,7 @@ import {
     SimulationOptions,
     SimulationOutput,
 } from '../interfaces/simulation.interface.js';
+import { DiffusionEquation } from '../interfaces/time.interface.js';
 import { randNormal } from '../utils/random.utils.js';
 
 export class Simulation implements SimulationInterface {
@@ -21,8 +22,11 @@ export class Simulation implements SimulationInterface {
     private pause_interval: NodeJS.Timeout | null = null;
     private current_simulation_step: number = -1;
 
+    private readonly BOLTZMANN_CONSTANT = 1.38064852e-23;
+
     constructor(options: SimulationOptions) {
         this.options = options;
+        this.runValidations();
         this.initParticles();
     }
 
@@ -61,6 +65,8 @@ export class Simulation implements SimulationInterface {
     }
 
     async run(): Promise<SimulationOutput> {
+        this.validateParticles(this.particles);
+
         this.stopped = false;
         this.running = true;
 
@@ -86,9 +92,13 @@ export class Simulation implements SimulationInterface {
 
             for (const particle of this.particles) {
                 // Save the particle's state
-                step_particles.push(
-                    this.processParticleAtEachStep(particle, time, step_size),
-                );
+                step_particles.push({
+                    ...this.processParticleAtGivenStepAndTime(
+                        particle,
+                        time,
+                        step_size,
+                    ),
+                });
             }
 
             // Save the particles at each step
@@ -101,6 +111,9 @@ export class Simulation implements SimulationInterface {
         return this.stop();
     }
 
+    /**
+     * @description Finish the simulation and return the output
+     */
     finish(): SimulationOutput {
         return {
             path: this.particles_history,
@@ -108,45 +121,56 @@ export class Simulation implements SimulationInterface {
         };
     }
 
-    processParticleAtEachStep(
+    /**
+     * @description Process a particle at a given step and time
+     */
+    processParticleAtGivenStepAndTime(
         particle: Particle,
         time: number,
         step_size: number,
     ): Particle {
         // Get particle properties
-        const {
-            x: particle_x,
-            y: particle_y,
-            diffusion_coefficient,
-        } = particle;
+        const { x: particle_x, y: particle_y, z: particle_z, mass } = particle;
 
         // Save the particle position
         let x = particle_x;
         let y = particle_y;
+        let z = particle_z;
 
         // Calculate the diffusion coefficient
-        const D =
-            typeof diffusion_coefficient === 'function'
-                ? diffusion_coefficient({ particle, t: time })
-                : diffusion_coefficient;
+        const D = this.getDiffusionCoefficient(particle, time);
 
         // Calculate the variance of the normal distribution
         const variance = 2 * D * step_size;
 
+        // calculate gravity force on each axis
+        const { gravity } = this.options;
+        if (gravity) {
+            const { x: gx, y: gy, z: gz } = gravity;
+            x += gx * mass;
+            y += gy * mass;
+            z = typeof z === 'number' ? z + gz * mass : undefined;
+        }
+
         // Calculate the change in x and y
         const dx = randNormal(0, variance);
         const dy = randNormal(0, variance);
+        const dz = randNormal(0, variance);
 
         // Move in the direction of the angle
         x += dx;
         y += dy;
+        z = typeof z === 'number' ? z + dz : undefined;
 
         // Update the particle position
         particle.x = x;
         particle.y = y;
+        particle.z = z;
 
         // Calculate the distance moved
-        const distance_moved = Math.sqrt(dx ** 2 + dy ** 2);
+        const distance_moved = Math.sqrt(
+            dx ** 2 + dy ** 2 + (typeof dz === 'number' ? dz ** 2 : 0),
+        );
 
         // Update the particle distance moved
         particle.distance_moved = distance_moved;
@@ -159,6 +183,107 @@ export class Simulation implements SimulationInterface {
         particle.velocity = velocity;
 
         // Returns a copy of the particle with the updated properties
-        return { ...particle };
+        return particle;
+    }
+
+    /**
+     * @description Get the diffusion coefficient at a given time for a given particle. Calculates the global diffusion coefficient if it is defined, otherwise uses the particle's diffusion coefficient
+     */
+    getDiffusionCoefficient(particle: Particle, time: number): number {
+        const getCoefficient = (coefficient: any) => {
+            if (typeof coefficient === 'number') {
+                return coefficient;
+            } else if (typeof coefficient === 'string') {
+                return this.getDiffusionCoefficientBasedOnEquation(
+                    coefficient as DiffusionEquation,
+                    particle,
+                );
+            } else {
+                return coefficient({ particle, t: time });
+            }
+        };
+
+        if (this.options.global_diffusion_coefficient) {
+            return getCoefficient(this.options.global_diffusion_coefficient);
+        } else {
+            return getCoefficient(particle.diffusion_coefficient);
+        }
+    }
+
+    /**
+     * @description Get the diffusion coefficient based on the equation provided
+     */
+    getDiffusionCoefficientBasedOnEquation(
+        equation: DiffusionEquation,
+        particle: Particle,
+    ): number {
+        switch (equation) {
+            case 'Einstein-Stokes':
+                return this.einsteinStokesEquation(particle);
+            default:
+                return this.einsteinStokesEquation(particle);
+        }
+    }
+
+    /**
+     * @description Calculate the diffusion coefficient using the Einstein-Stokes equation
+     */
+    einsteinStokesEquation(particle: Particle): number {
+        const { radius } = particle;
+        const { viscosity, temperature } = this.options;
+
+        if (
+            typeof radius !== 'number' ||
+            typeof viscosity !== 'number' ||
+            typeof temperature !== 'number'
+        ) {
+            throw new Error(
+                'Missing required parameters for Einstein-Stokes equation',
+            );
+        }
+
+        return (
+            (this.BOLTZMANN_CONSTANT * temperature) /
+            (6 * Math.PI * viscosity * radius)
+        );
+    }
+
+    /**
+     * @description Run validations on the simulation options to ensure the simulation can run
+     */
+    runValidations() {
+        const { steps, step_size } = this.options;
+
+        if (typeof steps !== 'number' || steps <= 0) {
+            throw new Error('Simulation steps must be a number greater than 0');
+        }
+
+        if (typeof step_size !== 'number' || step_size <= 0) {
+            throw new Error(
+                'Simulation step size must be a number greater than 0',
+            );
+        }
+    }
+
+    /**
+     * @description Validate the particles in the simulation
+     */
+    validateParticles(particles: Particle[]) {
+        let hasZ = false;
+        let hasNoZ = false;
+
+        for (const particle of particles) {
+            if (typeof particle.z !== 'undefined') {
+                hasZ = true;
+            } else {
+                hasNoZ = true;
+            }
+
+            if (hasZ && hasNoZ) {
+                throw new Error(
+                    'All particles must either have a z-coordinate or none of them should have a z-coordinate',
+                );
+            }
+        }
     }
 }
