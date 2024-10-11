@@ -26,6 +26,7 @@ export class Simulation implements SimulationInterface {
 
     constructor(options: SimulationOptions) {
         this.options = options;
+        this.runValidations();
         this.initParticles();
     }
 
@@ -64,6 +65,8 @@ export class Simulation implements SimulationInterface {
     }
 
     async run(): Promise<SimulationOutput> {
+        this.validateParticles(this.particles);
+
         this.stopped = false;
         this.running = true;
 
@@ -108,6 +111,9 @@ export class Simulation implements SimulationInterface {
         return this.stop();
     }
 
+    /**
+     * @description Finish the simulation and return the output
+     */
     finish(): SimulationOutput {
         return {
             path: this.particles_history,
@@ -115,6 +121,9 @@ export class Simulation implements SimulationInterface {
         };
     }
 
+    /**
+     * @description Process a particle at a given step and time
+     */
     processParticleAtGivenStepAndTime(
         particle: Particle,
         time: number,
@@ -237,5 +246,44 @@ export class Simulation implements SimulationInterface {
             (this.BOLTZMANN_CONSTANT * temperature) /
             (6 * Math.PI * viscosity * radius)
         );
+    }
+
+    /**
+     * @description Run validations on the simulation options to ensure the simulation can run
+     */
+    runValidations() {
+        const { steps, step_size, particles } = this.options;
+
+        if (typeof steps !== 'number' || steps <= 0) {
+            throw new Error('Simulation steps must be a number greater than 0');
+        }
+
+        if (typeof step_size !== 'number' || step_size <= 0) {
+            throw new Error(
+                'Simulation step size must be a number greater than 0',
+            );
+        }
+    }
+
+    /**
+     * @description Validate the particles in the simulation
+     */
+    validateParticles(particles: Particle[]) {
+        let hasZ = false;
+        let hasNoZ = false;
+
+        for (const particle of particles) {
+            if (typeof particle.z !== 'undefined') {
+                hasZ = true;
+            } else {
+                hasNoZ = true;
+            }
+
+            if (hasZ && hasNoZ) {
+                throw new Error(
+                    'All particles must either have a z-coordinate or none of them should have a z-coordinate',
+                );
+            }
+        }
     }
 }

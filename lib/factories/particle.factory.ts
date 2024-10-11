@@ -8,6 +8,8 @@ import {
  * @returns A particle
  */
 export function createParticle(params: ParticleCreation): Particle {
+    validateParticleCreation(params);
+
     return {
         x: params.x,
         y: params.y,
@@ -28,5 +30,27 @@ export function createMultipleParticles(
     params: ParticleCreation,
     quantity: number,
 ): Particle[] {
-    return Array.from({ length: quantity }, () => createParticle(params));
+    return Array.from({ length: quantity }, () => {
+        validateParticleCreation(params);
+        return createParticle(params);
+    });
+}
+
+/**
+ * @description Validate the creation of a particle
+ */
+function validateParticleCreation(particle: ParticleCreation) {
+    const { x, y, z, mass } = particle;
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+        throw new Error('Particle x and y coordinates must be numbers');
+    }
+
+    if (typeof z !== 'undefined' && typeof z !== 'number') {
+        throw new Error('Particle z coordinate must be a number');
+    }
+
+    if (typeof mass !== 'number' || mass <= 0) {
+        throw new Error('Particle mass must be a number greater than 0');
+    }
 }
