@@ -19,6 +19,7 @@ export function createParticle(params: ParticleCreation): Particle {
         total_distance_moved: 0,
         distance_moved: 0,
         mass: params.mass,
+        radius: params.radius,
     };
 }
 
