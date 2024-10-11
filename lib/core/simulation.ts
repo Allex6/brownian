@@ -252,7 +252,7 @@ export class Simulation implements SimulationInterface {
      * @description Run validations on the simulation options to ensure the simulation can run
      */
     runValidations() {
-        const { steps, step_size, particles } = this.options;
+        const { steps, step_size } = this.options;
 
         if (typeof steps !== 'number' || steps <= 0) {
             throw new Error('Simulation steps must be a number greater than 0');

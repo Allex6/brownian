@@ -8,8 +8,7 @@ import {
  * @description This is just a helper function that creates a simulation object with the given params and returns it.
  */
 export function brownian(options: SimulationOptions): SimulationInterface {
-    const simulation = new Simulation(options);
-    return simulation;
+    return new Simulation(options);
 }
 
 export { Simulation };
